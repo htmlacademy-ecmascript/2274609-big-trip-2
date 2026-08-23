@@ -1,5 +1,5 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
-import { getCapitalaizedType, formatFormDateTime, getTypeOffers } from '../utils/point-utils.js';
+import { getCapitalizedType, formatFormDateTime, getTypeOffers } from '../utils/point-utils.js';
 import he from 'he';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
@@ -13,12 +13,13 @@ const createOffersTemplate = (type, offers, offersData, isDisabled) => {
 
   const listOffers = currentOffers.offers.map((offer) => {
     const isChecked = offers.includes(offer.id) ? 'checked' : '';
+    const encodedOfferId = he.encode(String(offer.id));
     const item = `<div class="event__offer-selector">
-                        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.id}" type="checkbox" name="event-offer-${offer.id}"  data-offer-id="${offer.id}" ${isChecked} ${isDisabled ? 'disabled' : ''}>
-                        <label class="event__offer-label" for="event-offer-${offer.id}">
-                          <span class="event__offer-title">${offer.title}</span>
+                        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${encodedOfferId}" type="checkbox" name="event-offer-${encodedOfferId}"  data-offer-id="${encodedOfferId}" ${isChecked} ${isDisabled ? 'disabled' : ''}>
+                        <label class="event__offer-label" for="event-offer-${encodedOfferId}">
+                          <span class="event__offer-title">${he.encode(offer.title)}</span>
                           &plus;&euro;&nbsp;
-                          <span class="event__offer-price">${offer.price}</span>
+                          <span class="event__offer-price">${he.encode(String(offer.price))}</span>
                         </label>
                       </div>`;
     return item;
@@ -37,7 +38,7 @@ const createPhotosTemplate = (photos) => {
     return '';
   }
 
-  const listPhotos = photos.map((photo) => `<img class="event__photo" src="${photo.src}" alt="${photo.description}">`).join('');
+  const listPhotos = photos.map((photo) => `<img class="event__photo" src="${he.encode(photo.src)}" alt="${he.encode(photo.description)}">`).join('');
 
   const templatePhotos = `<div class="event__photos-container">
                       <div class="event__photos-tape">
@@ -55,7 +56,7 @@ const createDescriptionTemplate = (description, pictures) => {
     return '';
   }
 
-  const templateDescription = hasDescription ? `<p class="event__destination-description">${description}</p>` : '';
+  const templateDescription = hasDescription ? `<p class="event__destination-description">${he.encode(description)}</p>` : '';
 
   const templatePhotos = createPhotosTemplate(pictures);
 
@@ -70,10 +71,10 @@ const createDescriptionTemplate = (description, pictures) => {
 const createOffersTypeListTemplate = (type, offersData) => {
 
   const listType = offersData.map((offer) => {
-    const isChecked = type === offer.type ? 'cheked' : '';
+    const isChecked = type === offer.type ? 'checked' : '';
     const itemList = `<div class="event__type-item">
-                          <input id="event-type-${offer.type}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${offer.type}" ${isChecked}>
-                          <label class="event__type-label  event__type-label--${offer.type}" for="event-type-${offer.type}-1">${offer.type}</label>
+                          <input id="event-type-${he.encode(offer.type)}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${he.encode(offer.type)}" ${isChecked}>
+                          <label class="event__type-label  event__type-label--${he.encode(offer.type)}" for="event-type-${he.encode(offer.type)}-1">${he.encode(offer.type)}</label>
                         </div>`;
     return itemList;
   }).join('');
@@ -88,7 +89,7 @@ const createOffersTypeListTemplate = (type, offersData) => {
 };
 
 const createDestinationListTemplate = (destinationsData) => {
-  const listCity = destinationsData.map((destination) => `<option value="${destination.name}"></option>`).join('');
+  const listCity = destinationsData.map((destination) => `<option value="${he.encode(destination.name)}"></option>`).join('');
   const templateListCity = `<datalist id="destination-list-1">${listCity}</datalist>`;
   return templateListCity;
 };
@@ -100,9 +101,9 @@ const createTemplate = (state, offersData, destinationsData) => {
 
   const { name = '', description = '', pictures = [] } = currentDestination || {};
 
-  const capitalizedType = getCapitalaizedType(type);
+  const capitalizedType = getCapitalizedType(type);
 
-  const nameCity = name.length !== 0 ? name : '';
+  // const nameCity = name.length !== 0 ? name : '';
 
   const dateStart = formatFormDateTime(dateFrom);
   const dateEnd = formatFormDateTime(dateTo);
@@ -138,9 +139,9 @@ const createTemplate = (state, offersData, destinationsData) => {
 
                   <div class="event__field-group  event__field-group--destination">
                     <label class="event__label  event__type-output" for="event-destination-1">
-                      ${capitalizedType}
+                      ${he.encode(capitalizedType)}
                     </label>
-                    <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(nameCity)}" list="destination-list-1" autocomplete="off" ${isDisabled ? 'disabled' : ''}>
+                    <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(name)}" list="destination-list-1" autocomplete="off" ${isDisabled ? 'disabled' : ''}>
                      ${templateListCity}
                   </div>
 
@@ -183,6 +184,8 @@ export default class FormEditEvent extends AbstractStatefulView {
   #handleFormBtnCloseClick = null;
   #handleFormBtnCancelClick = null;
 
+  #saveButton = null;
+
   #datepickerFrom = null;
   #datepickerTo = null;
 
@@ -222,6 +225,10 @@ export default class FormEditEvent extends AbstractStatefulView {
     this.updateElement(FormEditEvent.parsePointToState(point));
   }
 
+  resetShake() {
+    this.element.classList.remove('shake');
+  }
+
   removeElement() {
     if (this.#datepickerFrom) {
       this.#datepickerFrom.destroy();
@@ -237,6 +244,8 @@ export default class FormEditEvent extends AbstractStatefulView {
   }
 
   _restoreHandlers = () => {
+    this.#saveButton = this.element.querySelector('.event__save-btn');
+
     const isNewPoint = !this._state.id;
 
     if (isNewPoint) {
@@ -276,14 +285,14 @@ export default class FormEditEvent extends AbstractStatefulView {
 
     this.#datepickerFrom = flatpickr(dateStartElement, {
       ...commonConfig,
-      defaultDate: dateStartElement.value,
+      defaultDate: this._state.dateFrom,
       maxDate: this._state.dateTo || null,
       onChange: this.#dateFromChangeHandler,
     });
 
     this.#datepickerTo = flatpickr(dateEndElement, {
       ...commonConfig,
-      defaultDate: dateEndElement.value,
+      defaultDate: this._state.dateTo,
       minDate: this._state.dateFrom || null,
       onChange: this.#dateToChangeHandler,
     });
@@ -296,17 +305,15 @@ export default class FormEditEvent extends AbstractStatefulView {
       this.#datepickerTo.set('minDate', userDate);
     }
 
-    const serializeDateTo = userDate ? userDate : null;
-
-    const isFormInvalid = !this._state.destination || !userDate || !serializeDateTo || Number(this._state.price) <= 0;
+    const isFormInvalid = !this._state.destination || !userDate || !this.#datepickerTo.selectedDates[0] || this._state.price <= 0;
 
     this._setState({
-      dateFrom: userDate ? userDate : null,
-      dateTo: serializeDateTo,
+      dateFrom: userDate || null,
       isSubmitDisabled: isFormInvalid,
     });
 
-    this.element.querySelector('.event__save-btn').disabled = isFormInvalid;
+    // this.element.querySelector('.event__save-btn').disabled = isFormInvalid;
+    this.#saveButton.disabled = isFormInvalid;
   };
 
   #dateToChangeHandler = ([userDate]) => {
@@ -316,18 +323,15 @@ export default class FormEditEvent extends AbstractStatefulView {
       this.#datepickerFrom.set('maxDate', userDate);
     }
 
-    const serializeDateFrom = this._state.dateFrom;
-    const serializeDateTo = userDate ? userDate : null;
-
-    const isFormInvalid = !this._state.destination || !serializeDateFrom || !userDate || Number(this._state.price) <= 0;
+    const isFormInvalid = !this._state.destination || !userDate || !this.#datepickerFrom.selectedDates[0] || this._state.price <= 0;
 
     this._setState({
-      dateFrom: serializeDateFrom,
-      dateTo: serializeDateTo,
+      dateTo: userDate || null,
       isSubmitDisabled: isFormInvalid,
     });
 
-    this.element.querySelector('.event__save-btn').disabled = isFormInvalid;
+    // this.element.querySelector('.event__save-btn').disabled = isFormInvalid;
+    this.#saveButton.disabled = isFormInvalid;
   };
 
   #typeChangeHandler = (evt) => {
@@ -393,22 +397,15 @@ export default class FormEditEvent extends AbstractStatefulView {
     const userPrice = evt.target.value.trim();
     const isOnlyNumbers = /^\d+$/.test(userPrice);
 
-    const hasDestination = Boolean(
-      this._state.destination &&
-      (typeof this._state.destination === 'string' ||
-        typeof this._state.destination === 'number' ||
-        this._state.destination.id ||
-        this._state.destination.name)
-    );
-
-    const isFormInvalid = !isOnlyNumbers || Number(userPrice) <= 0 || !hasDestination || !this._state.dateFrom || !this._state.dateTo;
+    const isFormInvalid = !isOnlyNumbers || userPrice <= 0 || !this._state.destination || !this._state.dateFrom || !this._state.dateTo;
 
     this._setState({
       price: isOnlyNumbers ? Number(userPrice) : 0,
       isSubmitDisabled: isFormInvalid,
     });
 
-    this.element.querySelector('.event__save-btn').disabled = isFormInvalid;
+    // this.element.querySelector('.event__save-btn').disabled = isFormInvalid;
+    this.#saveButton.disabled = isFormInvalid;
   };
 
   #destinationChangeHandler = (evt) => {
@@ -433,21 +430,13 @@ export default class FormEditEvent extends AbstractStatefulView {
   };
 
   static parsePointToState(point) {
-    const hasDestination = Boolean(
-      point.destination &&
-      (typeof point.destination === 'string' ||
-        typeof point.destination === 'number' ||
-        point.destination.id ||
-        point.destination.name)
-    );
-
     return {
       ...point,
       isSubmitDisabled:
-        !hasDestination ||
+        !point.destination ||
         !point.dateFrom ||
         !point.dateTo ||
-        Number(point.price) <= 0,
+        point.price <= 0,
       isDisabled: false,
       isSaving: false,
       isDeleting: false

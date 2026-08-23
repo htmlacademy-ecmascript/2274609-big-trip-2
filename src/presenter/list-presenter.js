@@ -51,7 +51,7 @@ export default class ListPresenter {
     this.#filtersModel = filterModel;
 
     this.#newPointPresenter = new AddNewPointPresenter({
-      container: this.#listEventComponent.element,
+      container: this.#listEventComponent,
       onDataChange: this.#handleViewAction,
       onDestroy: this.#handleNewFormClose,
       getOffers: () => this.offers,
@@ -123,10 +123,10 @@ export default class ListPresenter {
 
   #renderNewEventButton() {
     if (this.#isServerError) {
-      this.#btnAddNewPointComponent.element.disabled = true;
+      this.#btnAddNewPointComponent.setDisabled(true);
     } else {
       this.#btnAddNewPointComponent.setClickHandler(this.#handleBtnAddNewPointClick);
-      this.#btnAddNewPointComponent.element.disabled = false;
+      this.#btnAddNewPointComponent.setDisabled(false);
     }
   }
 
@@ -151,19 +151,19 @@ export default class ListPresenter {
 
     if (this.#isLoading) {
       this.#renderLoading();
-      this.#btnAddNewPointComponent.element.disabled = true;
+      this.#btnAddNewPointComponent.setDisabled(true);
       return;
     }
 
     if (this.offers.length === 0 || this.destinations.length === 0) {
       remove(this.#loadingComponent);
       render(this.#serverErrorComponent, this.#listContainer);
-      this.#btnAddNewPointComponent.element.disabled = true;
+      this.#btnAddNewPointComponent.setDisabled(true);
       return;
     }
 
     remove(this.#loadingComponent);
-    this.#btnAddNewPointComponent.element.disabled = false;
+    this.#btnAddNewPointComponent.setDisabled(false);
 
     if (this.points.length === 0) {
       this.#renderNoPoint();
@@ -194,7 +194,7 @@ export default class ListPresenter {
 
   #renderPoint(point, offers, destinations) {
     const pointPresenter = new PointPresenter({
-      listEventComponent: this.#listEventComponent.element,
+      listEventComponent: this.#listEventComponent,
       offers,
       destinations,
       onDataChange: this.#handleViewAction,

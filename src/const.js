@@ -1,16 +1,6 @@
-const POINT__TYPES = [
-  'taxi',
-  'bus',
-  'train',
-  'ship',
-  'drive',
-  'flight',
-  'check-in',
-  'sightseeing',
-  'restaurant',
-];
+import { nanoid } from 'nanoid';
 
-const EMPTY__POINT = {
+const EMPTY_POINT = {
   type: 'flight',
   destination: {},
   dateFrom: null,
@@ -20,17 +10,30 @@ const EMPTY__POINT = {
   isFavorite: false,
 };
 
-const TIME__LIMIT = {
+const DateFormat = {
+  DATE_FORMAT: 'MMM D',
+  MACHINE_DATE_FORMAT: 'YYYY-MM-DD',
+  HUMAN_TIME_FORMAT: 'HH:mm',
+  MACHINE_TIME_FORMAT: 'YYYY-MM-DDTHH:mm',
+  FORM_DATE_TIME_FORMAT: 'DD/MM/YY HH:mm'
+};
+
+const TimeLimit = {
   LOWER_LIMIT: 350,
   UPPER_LIMIT: 1050,
 };
 
-const AUTORIZATION = 'Basic Hew76qE2hdfW23sD';
-const END__POINT = 'https://22.objects.htmlacademy.pro/big-trip';
+const AUTHORIZATION = `Basic ${nanoid()}`;
+const END_POINT = 'https://22.objects.htmlacademy.pro/big-trip';
 
-const CITY__COUNT = 3;
+const CITY_COUNT = 3;
 
-const METHOD = {
+const HOURS_IN_DAY = 24;
+const MINUTES_IN_HOUR = 60;
+const COUNT_ZERO = 2;
+
+
+const Method = {
   GET: 'GET',
   PUT: 'PUT',
   'POST': 'POST',
@@ -69,17 +72,26 @@ const UpdateType = {
   MAJOR: 'MAJOR',
   INIT: 'INIT',
 };
+const Mode = {
+  DEFAULT: 'DEFAULT',
+  EDITING: 'EDITING',
+};
+
 
 export {
-  POINT__TYPES as POINT__TYPE,
   FilterType,
   MessageNoEvent,
   SortType,
   UserAction,
   UpdateType,
-  EMPTY__POINT,
-  TIME__LIMIT as TimeLimit,
-  AUTORIZATION, END__POINT,
-  CITY__COUNT,
-  METHOD
+  EMPTY_POINT,
+  TimeLimit,
+  AUTHORIZATION, END_POINT,
+  CITY_COUNT,
+  Method,
+  DateFormat,
+  HOURS_IN_DAY,
+  MINUTES_IN_HOUR,
+  COUNT_ZERO,
+  Mode
 };

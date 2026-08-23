@@ -1,6 +1,7 @@
 import AbstractView from './framework/view/abstract-view.js';
-import { CITY__COUNT } from './const.js';
+import { CITY_COUNT } from './const.js';
 import dayjs from 'dayjs';
+import he from 'he';
 
 const getTripRoute = (points, dataDestinations) => {
   const cityNames = points.map((point) => {
@@ -12,11 +13,11 @@ const getTripRoute = (points, dataDestinations) => {
     return '';
   }
 
-  if (cityNames.length <= CITY__COUNT) {
+  if (cityNames.length <= CITY_COUNT) {
     return cityNames.join(' &mdash; ');
   }
 
-  return `${cityNames[0]} &mdash; &hellip; &mdash; ${cityNames[cityNames.length - 1]}`;
+  return `${he.encode(cityNames[0])} &mdash; &hellip; &mdash; ${he.encode(cityNames[cityNames.length - 1])}`;
 };
 
 const getTripDates = (points) => {
@@ -39,7 +40,7 @@ const getTripDates = (points) => {
 
 
 const getTripTotalPrice = (points, dataOffers) => points.reduce((total, point) => {
-  let pointPrice = Number(point.price || 0);
+  let pointPrice = point.price || 0;
 
   const offersByType = dataOffers.find((item) => item.type === point.type);
 

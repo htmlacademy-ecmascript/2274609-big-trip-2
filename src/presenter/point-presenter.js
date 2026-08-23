@@ -1,13 +1,8 @@
 import PointTripEvent from '../view/point-trip-view';
 import FormEditEvent from '../view/form-edit-view';
 import { render, replace, remove } from '../framework/render';
-import { UserAction, UpdateType } from '../const';
+import { UserAction, UpdateType, Mode } from '../const';
 import { isEscapeKey } from '../utils/common';
-
-const Mode = {
-  DEFAULT: 'DEFAULT',
-  EDITING: 'EDITING',
-};
 
 export default class PointPresenter {
   #listEventContainer = null;
@@ -22,7 +17,7 @@ export default class PointPresenter {
   #mode = Mode.DEFAULT;
 
   constructor({ listEventComponent, offers, destinations, onDataChange, onModeChange }) {
-    this.#listEventContainer = listEventComponent;
+    this.#listEventContainer = listEventComponent.element;
     this.#offers = offers;
     this.#destinations = destinations;
     this.#handleDataChange = onDataChange;
@@ -64,7 +59,7 @@ export default class PointPresenter {
     }
 
     if (this.#mode === Mode.EDITING) {
-      replace(this.#formEditComponent, prevFormEditComponent.element);
+      replace(this.#formEditComponent, prevFormEditComponent);
     }
 
     remove(prevPointComponent);
@@ -112,12 +107,13 @@ export default class PointPresenter {
   destroy() {
     remove(this.#pointComponent);
     remove(this.#formEditComponent);
+    document.removeEventListener('keydown', this.#escKeyDownHandler);
   }
 
   resetView() {
     if (this.#mode !== Mode.DEFAULT) {
 
-      this.#formEditComponent.element.classList.remove('shake');
+      this.#formEditComponent.resetShake();
 
       this.#formEditComponent.reset(this.#point);
 

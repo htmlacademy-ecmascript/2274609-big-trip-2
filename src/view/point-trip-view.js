@@ -1,12 +1,13 @@
 import AbstractView from '../framework/view/abstract-view.js';
+import he from 'he';
 import {
-  humanazePointDueDate,
+  humanizePointDueDate,
   formatMachineDate,
   formatMachineTime,
   humanizePointTime,
   getEventDuration,
   getTypeOffers,
-  getCapitalaizedType
+  getCapitalizedType
 } from '../utils/point-utils.js';
 
 const createOffersTemplate = (type, offers, offersData) => {
@@ -23,9 +24,9 @@ const createOffersTemplate = (type, offers, offersData) => {
 
   listOffers = chosenOffers.map((offer) => `
                   <li class="event__offer">
-                    <span class="event__offer-title">${offer.title}</span>
+                    <span class="event__offer-title">${he.encode(offer.title)}</span>
                     &plus;&euro;&nbsp;
-                    <span class="event__offer-price">${offer.price}</span>
+                    <span class="event__offer-price">${he.encode(String(offer.price))}</span>
                   </li>`);
 
   return `<h4 class="visually-hidden">Offers:</h4>
@@ -37,10 +38,10 @@ const createTemplate = (pointData, offersData, destinationsData) => {
   const currentItem = destinationsData.find((item) => destination === item.id);
   const currentNameCity = currentItem.name;
 
-  const capitalizedType = getCapitalaizedType(type);
+  const capitalizedType = getCapitalizedType(type);
 
   const machineDate = formatMachineDate(dateFrom);
-  const date = humanazePointDueDate(dateFrom);
+  const date = humanizePointDueDate(dateFrom);
 
   const machineStartTime = formatMachineTime(dateFrom);
   const humanStartTime = humanizePointTime(dateFrom);
@@ -60,7 +61,7 @@ const createTemplate = (pointData, offersData, destinationsData) => {
                 <div class="event__type">
                   <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
                 </div>
-                <h3 class="event__title">${capitalizedType} ${currentNameCity}</h3>
+                <h3 class="event__title">${he.encode(capitalizedType)} ${he.encode(currentNameCity)}</h3>
                 <div class="event__schedule">
                   <p class="event__time">
                     <time class="event__start-time" datetime="${machineStartTime}">${humanStartTime}</time>
@@ -70,7 +71,7 @@ const createTemplate = (pointData, offersData, destinationsData) => {
                   <p class="event__duration">${durationDate}</p>
                 </div>
                 <p class="event__price">
-                  &euro;&nbsp;<span class="event__price-value">${price}</span>
+                  &euro;&nbsp;<span class="event__price-value">${he.encode(String(price))}</span>
                 </p>
                 ${offersTemplate}
                 <button class="event__favorite-btn ${favoriteClassName}" type="button">
