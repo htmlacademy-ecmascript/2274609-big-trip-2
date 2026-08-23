@@ -17,7 +17,7 @@ export default class PointPresenter {
   #mode = Mode.DEFAULT;
 
   constructor({ listEventComponent, offers, destinations, onDataChange, onModeChange }) {
-    this.#listEventContainer = listEventComponent;
+    this.#listEventContainer = listEventComponent.element;
     this.#offers = offers;
     this.#destinations = destinations;
     this.#handleDataChange = onDataChange;
@@ -59,7 +59,7 @@ export default class PointPresenter {
     }
 
     if (this.#mode === Mode.EDITING) {
-      replace(this.#formEditComponent, prevFormEditComponent.element);
+      replace(this.#formEditComponent, prevFormEditComponent);
     }
 
     remove(prevPointComponent);
@@ -113,7 +113,7 @@ export default class PointPresenter {
   resetView() {
     if (this.#mode !== Mode.DEFAULT) {
 
-      this.#formEditComponent.element.classList.remove('shake');
+      this.#formEditComponent.resetShake();
 
       this.#formEditComponent.reset(this.#point);
 

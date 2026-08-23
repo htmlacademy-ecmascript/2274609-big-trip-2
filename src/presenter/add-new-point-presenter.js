@@ -36,7 +36,7 @@ export default class AddNewPointPresenter {
       onPointCancelClick: this.#handleCancelClick,
     });
 
-    render(this.#pointEditComponent, this.#container, RenderPosition.AFTERBEGIN);
+    render(this.#pointEditComponent, this.#container.element, RenderPosition.AFTERBEGIN);
 
     document.addEventListener('keydown', this.#escKeyDownHandler);
   }

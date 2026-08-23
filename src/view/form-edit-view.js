@@ -225,6 +225,10 @@ export default class FormEditEvent extends AbstractStatefulView {
     this.updateElement(FormEditEvent.parsePointToState(point));
   }
 
+  resetShake() {
+    this.element.classList.remove('shake');
+  }
+
   removeElement() {
     if (this.#datepickerFrom) {
       this.#datepickerFrom.destroy();
